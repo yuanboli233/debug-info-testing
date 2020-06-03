@@ -1,0 +1,26 @@
+----- Description -----
+
+	Given a binary program with DWARF information included, this script prints source code line numbers obtained from the DWARF information uniquely in the ascending order.
+	This script executes 'readelf -wL' to get this information.
+	This script discards lines whose "View" attributes are not nempty.
+	<source-file-name> is required as a parameter since when header files are included, the outputs of 'readelf -wL' might contain line numbers in the header files, and we only want line numbers in <source-file-name>.
+	The line numbers printed by this script are not guaranteed to be stoppable. Taking an intersection with covered line numbers should be better, but there is still no guarantee.
+
+----- Requirements -----
+
+	Python 3.5 or newer
+
+----- Usage -----
+
+	python3 dwarf-lines-reader.py <source-file-name> <binary-file-path>
+
+	Please don't include the path in <source-file-name>. Only the file name is enough. For <binary-file-path>, please include the path.
+
+----- Corner Cases -----
+
+	We assume all stoppable lines are included in the DWARF information, but there are some corner cases where this assumption is not true.
+	For example, the program one.c in the corner-cases directory is a corner case.
+	I compiled it using 'gcc -O3 -g one.c', and gdb can stop at line 5 on the resulting binary program, but there is no 'line 5' in the DWARF .debug_line information obtained by 'readelf -wL a.out'.
+	I haven't figured out how gdb knows that it's line 5. What's more interesting is that when I set a breakpoint on line 5, gdb prompts that it's setting that breakpoint in stdio2.h, but when I actually ran it, the program stopped on line 5 in one.c.
+	My gcc version is 7.4.0, and my gdb version is 8.1.0.20180409-git, and I'm using Ubuntu 18.04.3 LTS.
+	This thing can also be reproduced using gcc and gdb in sding@143.215.129.209.

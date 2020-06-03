@@ -1,0 +1,24 @@
+
+error: argument --builder: invalid choice: 'clang++' (choose from 'clang', 'clang-c', 'gcc')
+
+usage: DExTer test [-h] [--no-color-output] [--time-report] [-v] [-V] [-w]
+                   [--unittest {off,show-failures,show-all}]
+                   [--working-directory <file>] [--save-temps]
+                   [--fail-lt <float>] [--calculate-average] [--binary <file>]
+                   [--builder {clang,clang-c,gcc}] [--cflags CFLAGS]
+                   [--ldflags LDFLAGS] [--lldb-executable <file>] --debugger
+                   {dbgeng,lldb,vs2015,vs2017} [--max-steps <int>]
+                   [--pause-between-steps <seconds>] [--show-debugger]
+                   [--arch <architecture>]
+                   [--penalty-variable-optimized <int>]
+                   [--penalty-misordered-values <int>]
+                   [--penalty-irretrievable <int>]
+                   [--penalty-not-evaluatable <int>]
+                   [--penalty-missing-values <int>]
+                   [--penalty-incorrect-values <int>]
+                   [--penalty-unreachable <int>]
+                   [--penalty-misordered-steps <int>]
+                   [--penalty-missing-step <int>]
+                   [--penalty-incorrect-program-state <int>]
+                   [--results-directory <directory>]
+                   [<test-path>]
