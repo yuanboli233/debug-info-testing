@@ -10,6 +10,7 @@ This project depends on the following tools, please make sure you have the follo
 - gcovr
 - gcc
 - clang
+- dexter (code included in the repo)
 
 To test a clang compiler, please set "clang" as a softlink to the clang compiler with the desired version you wish to test.
 
