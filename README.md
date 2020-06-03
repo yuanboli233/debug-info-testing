@@ -1,5 +1,4 @@
 # Debugging Information Testing
-Debugging Information Validation
 
 This is a python implementation for the debug-information testing framework for the paper "Debug Information Validation for Optimized Code"
 
@@ -19,3 +18,4 @@ To test a clang compiler, please set "clang" as a softlink to the clang compiler
     ./config.sh
     python3 test-debug-info.py
 ```
+Bugs found by the framework will be put under "bugs" directory.
