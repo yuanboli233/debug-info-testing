@@ -6,7 +6,7 @@ csmith="csmith"
 
 #filename should be under the working directory
 def checkUB(cfilename):
-    clangfc="clang-trunk -msse4.2 -m64 -O0  -fsanitize=undefined"
+    clangfc="clang -msse4.2 -m64 -O0  -fsanitize=undefined"
     timeout="timeout"
     filename=cfilename.split(".")[0]
     exe = "exe." + filename + "-clang"

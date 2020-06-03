@@ -234,11 +234,11 @@ def get_stoppable_lines(cfile):
     rm_cmd = "rm a.out dwarf_line".split()
     dwarf_line_file = "dwarf_line.txt"
     run_and_get_returncode(rm_cmd)
-    gcc_compile = "gcc-trunk -msse4.2".split()
+    gcc_compile = "gcc -msse4.2".split()
     gcc_compile.extend([cfile])
     gcc_compile.extend("-g -O3".split())
     if run_and_get_returncode(gcc_compile) != 0:
-        print("gcc-trunk cannot compile")
+        print("gcc cannot compile")
         return 1
     run_dwarf_line_cmd = ["python3", dwarf_reader_py]
     run_dwarf_line_cmd.append(cfile)
