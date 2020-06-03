@@ -1,7 +1,8 @@
 # Debugging Information Testing
 
 This is a python implementation for the debug-information testing framework for the paper 
-    - Debug Information Validation for Optimized Code in *PLDI* 2020 by Yuanbo Li, Shuo Ding, Qirun Zhang, Davide Italiano
+
+- Debug Information Validation for Optimized Code in *PLDI* 2020 by Yuanbo Li, Shuo Ding, Qirun Zhang, Davide Italiano
 
 ## Dependency:
     
