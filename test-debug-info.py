@@ -156,7 +156,7 @@ def check_correctness(tmpc):
         for line in dex_outputf:
             if line.find("unexpected result:") >= 0:
                 print("===============================")
-                print("Find a bug")
+                print("Found a bug")
                 bugid = random.randint(0, 1000000)
                 bugfile = "bug_" + str(bugid) + ".c"
                 bugpath = os.path.join("bugs", bugfile)
