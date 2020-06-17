@@ -18,7 +18,7 @@ def checkUB(cfilename):
     compile_cmd.extend([ "-o", exe, cfilename])
     cplt = subprocess.run(compile_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if(cplt.returncode != 0):
-        print("cannot compile")
+        print("Seed Program Generation: cannot compile")
         return 2
 
     run_cmd =  "timeout -s 9 10".split()
@@ -26,7 +26,7 @@ def checkUB(cfilename):
     with open(out, "w") as outf:
         cplt = subprocess.run(run_cmd, stdout=outf, stderr=subprocess.DEVNULL)
         if cplt.returncode != 0:
-            print("exe timeout")
+            print("Seed Program Generation: exe timeout")
             subprocess.call(rm_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             return 3
     
@@ -34,7 +34,7 @@ def checkUB(cfilename):
     with open(out, "r") as outf:
         for line in outf:
             if line.find("runtime error") >= 0:
-                print("runtime error in exe")
+                print("Seed Program Generation: runtime error in exe")
                 rterrorflag=True
                 break
     subprocess.call(rm_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -108,7 +108,7 @@ def gencsmith(cfilename):
         minsize = 4000
         filesize = os.path.getsize(cfilename)
         if filesize < minsize:
-            print("cfile too small")
+            print("Seed Program Generation: generated C file too small")
             continue
 
         #check ccomp
@@ -116,9 +116,9 @@ def gencsmith(cfilename):
         ccomp_cmd.append(cfilename)
         cplt = subprocess.run(ccomp_cmd,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if cplt.returncode != 0:
-            print("ccomp quit")
+            print("Seed Program Generation: generated C file cannot pass ccomp")
             continue
 
-        print("have a good cfile")
+        print("Seed Program Generation: have a good seed file")
         return 0
         

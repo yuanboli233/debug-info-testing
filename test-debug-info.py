@@ -12,6 +12,7 @@ dwarf_reader_py = "./dwarf-lines-reader.py"
 dexter_py = "./dexter/dexter.py"
 lldb_executable = "lldb"
 clang_executable = "clang"
+dexter_compiler_flags = "-O3 -g"
 
 def generate_dex_file(cfile, newfile, actual_line, var_name, var_value):
     with open(cfile, "r") as inf:
@@ -72,13 +73,13 @@ def instrument_code(cfile, linenum, orig_cfile) -> int:
         compile_cmd.extend(["b.o"])
     ret = run_and_get_returncode(compile_cmd)
     if ret != 0:
-        print("does not compile in O0")
+        print("Collecting O0 Value: does not compile in O0")
         return 1
     #print("compiled")
 
     # setup debugger
     debugger = lldb.SBDebugger.Create()
-    print("seeking appropriate variables")
+    print("Collecting O0 Value: seeking appropriate variables")
     #print("create a debugger: ", debugger)
     debugger.SetAsync(False)
     binary_exe = "a.out"
@@ -117,9 +118,9 @@ def instrument_code(cfile, linenum, orig_cfile) -> int:
                 if var_type in accept_types:
                     shadowresult = shadow_validation(orig_cfile, shadowc, actual_line, var_name, var_type)
                     if shadowresult:
-                        print("Shadow validation passed for variable", var_name, "at line", actual_line)
+                        print("Shadow Validation: passed for variable", var_name, "at line", actual_line)
                     else:
-                        print("Shadow validation failed for variable", var_name, "at line", actual_line)
+                        print("Shadow Validation: failed for variable", var_name, "at line", actual_line)
                         continue
 
                     # check value consistency
@@ -132,26 +133,40 @@ def instrument_code(cfile, linenum, orig_cfile) -> int:
 
 
 def check_correctness(tmpc):
+    global dexter_compiler_flags, clang_executable
     rm_cmd = "rm out_O3.txt".split()
     run_and_get_returncode(rm_cmd)
-    print("test correctness in O3")
+    print("Verify Correctness: test correctness in flag", dexter_compiler_flags)
     dex_output = "dex_output.txt"
     rmdex_cmd = ["rm", dex_output]
     run_and_get_returncode(rmdex_cmd)
+
+    if clang_executable == "clang":
+        builder_flag = "--builder=clang-c" 
+    else:
+        builder_flag = "--builder=gcc"
     
     run_dex_cmd=[
             "python3", 
             dexter_py,
             "test", 
-            "--builder=clang-c",
+            builder_flag,
             "--debugger=lldb",
-            "--cflags", "-g -O3",
+            "--cflags", dexter_compiler_flags,
             "-v",
             tmpc]
+    #print("command: running", run_dex_cmd)
     with open(dex_output, "w") as dex_outputf:
         ret = run_and_get_returncode(run_dex_cmd, outf=dex_outputf, errf=dex_outputf)
-        if ret != 0:
-            print("dexter does not run properly, please check settings")
+    if ret != 0:
+        dexter_bug_flag = False
+        with open(dex_output, "r") as dex_outputf:
+            for line in dex_outputf:
+                if "This is a bug in DExTer." in line:
+                    dexter_bug_flag = True
+                    #print("encounter a bug in dexter")
+        if not dexter_bug_flag:
+            print("Warning: dexter does not run properly, please check settings")
     with open(dex_output, "r") as dex_outputf:
         for line in dex_outputf:
             if line.find("unexpected result:") >= 0:
@@ -183,11 +198,11 @@ def prepare_gcc_coverage(cfile):
     gcc_compile_cmd="gcc -msse4.2 -fprofile-arcs -ftest-coverage -fPIC -O0".split()
     gcc_compile_cmd.append(cfile)
     if run_and_get_returncode(gcc_compile_cmd, subprocess.DEVNULL, subprocess.DEVNULL) != 0:
-        print("gcc cannot compile!")
+        print("Coverage Collection: gcc cannot compile!")
         return 1
     run_exe_cmd = "timeout -s 9 10 ./a.out".split()
     if run_and_get_returncode(run_exe_cmd, devnull, devnull) != 0:
-        print("gcc exe cannot run or timeout")
+        print("Coverage Collection: gcc exe cannot run or timeout")
         return 2
     return 0
 
@@ -238,7 +253,7 @@ def get_stoppable_lines(cfile):
     gcc_compile.extend([cfile])
     gcc_compile.extend("-g -O3".split())
     if run_and_get_returncode(gcc_compile) != 0:
-        print("gcc cannot compile")
+        print("Stoppable Line Info: gcc cannot compile")
         return 1
     run_dwarf_line_cmd = ["python3", dwarf_reader_py]
     run_dwarf_line_cmd.append(cfile)
@@ -255,22 +270,24 @@ def get_stoppable_lines(cfile):
 
 
 def instrument_and_test(cfile, newfile, reach_lines, stop_lines):
-    print("start instrument and test")
+    print("Generating Actionable Program: start instrument and test")
     #print("reach lines:", reach_lines)
     #print("stoppable lines:", stop_lines)
     for linenum in list(stop_lines):
-        print("checking for line", linenum)
+        print("Generating Actionable Program: checking for line", linenum)
         debugger_test_main(cfile, linenum, cfile)
     rm_cmd=["rm", newfile]
     run_and_get_returncode(rm_cmd)
     candidate_reaches = set()
     reach_list = list(reach_lines)
     for i in range(0, 10):
+        if len(reach_list) - 1 <= 0:
+            break
         randidx = random.randint(0, len(reach_list)-1)
         candidate_reaches.add(reach_list[randidx])
     
     for linenum in candidate_reaches:
-        print("generate cc_inst for line", linenum)
+        print("Generating Actionable Program: generate cc_inst for line", linenum)
         with open(cfile, "r") as inf:
             with open(newfile, "w") as outf:
                 line_count = 1
@@ -289,7 +306,7 @@ def instrument_and_test(cfile, newfile, reach_lines, stop_lines):
 
                     line_count += 1
         debugger_test_main(newfile, linenum, cfile)
-        print("tested for line", linenum)
+        print("Generating Actionable Program: tested for line", linenum)
     return
 
 
@@ -300,10 +317,10 @@ def test_gdb():
     inst_file = "cc_inst.c"
     while True:
         gencsmith.gencsmith(cfile) 
-        print("Working on a new valid C file")
+        print("Seed Program Generation: Working on a new valid C file")
         if prepare_gcc_coverage(cfile) != 0:
             continue
-        print("gcc sanity check finish")
+        print("Seed Program Generation: gcc sanity check finish")
         reach_lines = get_coverage(cfile)
         stoppable_lines = get_stoppable_lines(cfile)
         #print("collect reachable lines")
@@ -312,4 +329,16 @@ def test_gdb():
 
 
 if __name__ == "__main__":
+    with open("config.txt", "r") as config_f:
+        for line in config_f:
+            if "testing compiler:" in line:
+                clang_executable = line.split(": ")[-1].strip()
+                print("compiler to test is", clang_executable)
+                if clang_executable != "clang" and clang_executable != "gcc":
+                    print("In the config file, please set the compiler to be tested as clang or gcc")
+                    exit(1)
+            if "testing compiler flags:" in line:
+                dexter_compiler_flags = line.split(": ")[-1].strip()
+                print("compiler flags used to verify O0 is:", dexter_compiler_flags)
+
     test_gdb()

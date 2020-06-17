@@ -1,0 +1,2 @@
+testing compiler: clang
+testing compiler flags: -O2 -g
