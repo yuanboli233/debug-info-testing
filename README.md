@@ -21,7 +21,8 @@ Please use the dexter in our repository, if you have other versions of dexter in
 To test a clang compiler, please set "clang" as a softlink to the clang compiler with the desired version you wish to test.
 
 ## Usage:
-Please first run the config.sh before the use of the testing framework.
+First config the compiler and flag options for the debug-information testing and set the options in config.txt
+Then run the config.sh before the actual use of the testing framework.
 ```
     ./config.sh
     python3 test-debug-info.py
