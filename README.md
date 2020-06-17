@@ -22,6 +22,12 @@ To test a clang compiler, please set "clang" as a softlink to the clang compiler
 
 ## Usage:
 First config the compiler and flag options for the debug-information testing and set the options in config.txt
+```
+config.txt:
+testing compiler: clang
+testing compiler flags: -O2 -g
+```
+
 Then run the config.sh before the actual use of the testing framework.
 ```
     ./config.sh
