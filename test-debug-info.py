@@ -220,8 +220,12 @@ def collect_reach_lines(gcovtxt):
                         for i in range(int(start.strip()), int(end.strip())+1):
                             reach_lines.add(i)
                     else:
-                        # single line
-                        reach_lines.add(int(l.strip()))
+                        try:
+                            # single line
+                            reach_lines.add(int(l.strip()))
+                        except ValueError:
+                            # It is a blank line, skip it.
+                            pass
                     #print(l)
     #print(reach_lines)
     return reach_lines
