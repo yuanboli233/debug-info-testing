@@ -2,6 +2,7 @@
 
 import os, sys
 import imp
+import importlib.util
 import shutil
 import random
 import subprocess
@@ -22,7 +23,19 @@ def generate_dex_file(cfile, newfile, actual_line, var_name, var_value):
             dexter_str = '//' + dexter_commands['expect'] + '(\'' + var_name + "\', \'" + var_value + "\', on_line=" + str(actual_line) + ")\n"
             outf.write(dexter_str)
 
+
 def load_lldb_interface():
+    lldb_executable = "lldb"
+    args = [lldb_executable, '-P']
+    pythonpath = subprocess.check_output(args, stderr=subprocess.STDOUT).rstrip().decode('utf-8')
+    sys.path.append(pythonpath)
+    module = importlib.import_module('lldb')
+    #module_spec = importlib.util.spec_from_file_location('lldb', pythonpath)
+    #module = importlib.util.module_from_spec(module_spec)
+    #module_spec.loader.exec_module(module)
+    return module
+
+def load_lldb_interface_bk():
     lldb_executable = "lldb"
     args = [lldb_executable, '-P']
     pythonpath = subprocess.check_output(args, stderr=subprocess.STDOUT).rstrip().decode('utf-8')
